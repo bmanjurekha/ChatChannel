@@ -43,8 +43,8 @@ public class ChannelController {
     }
 
     @DeleteMapping("channel/{channelId}")
-    public ResponseEntity<List<Channel>> deleteChannel(@PathVariable long channelId) {
-        channelService.delete(channelId);
+    public ResponseEntity<List<Channel>> deleteChannel(@PathVariable long channelid) {
+        channelService.delete(channelid);
         return getAllChannels();
     }
 
