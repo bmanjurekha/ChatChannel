@@ -15,19 +15,11 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 @Component
-public class ChannelSocketHandler extends TextWebSocketHandler {
+public class ChatSocketHandler extends TextWebSocketHandler {
+
     private List<WebSocketSession> sessions = new ArrayList<>();
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        broadcast("Channel is Online","New Message");
-    }
-    public void broadcast(String channel, Channel oldState, Channel newState) {
-        ChannelStateDetails details = new ChannelStateDetails(oldState, newState);
-        broadcastJson(channel, details);
-    }
     public void broadcast(String channel, Channel newChannel) {
         broadcastJson(channel, newChannel);
     }
@@ -39,7 +31,7 @@ public class ChannelSocketHandler extends TextWebSocketHandler {
     public void broadcast(String channel, String message) {
         try {
             for (WebSocketSession webSession : sessions) { // broadcast
-                String channelCreate = webSession.getHandshakeHeaders().getFirst("channel-state");
+                String channelCreate = webSession.getHandshakeHeaders().getFirst("chat");
                 if(channel.equals(channelCreate)) {
                     webSession.sendMessage(new TextMessage(message));
                 }
@@ -48,8 +40,6 @@ public class ChannelSocketHandler extends TextWebSocketHandler {
             ex.printStackTrace();
         }
     }
-
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
@@ -61,5 +51,4 @@ public class ChannelSocketHandler extends TextWebSocketHandler {
         sessions.remove(session);
         System.out.println("Session was removed");
     }
-
 }

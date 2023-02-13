@@ -3,6 +3,7 @@ import com.example.chatchannel.Model.Channel;
 import com.example.chatchannel.Model.ChannelStateDetails;
 import com.example.chatchannel.Services.ChannelService;
 import com.example.chatchannel.WS.ChannelSocketHandler;
+import com.example.chatchannel.WS.ChatSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import java.util.List;
 public class ChannelController {
     @Autowired
     private ChannelSocketHandler channelSocketHandler;
+    @Autowired
+    private ChatSocketHandler chatSocketHandler;
     @Autowired
     private ChannelService channelService;
 
@@ -33,6 +36,7 @@ public class ChannelController {
     public ResponseEntity<List<Channel>> addChannel(@RequestBody Channel channel) {
         channelService.save(channel);
         channelSocketHandler.broadcast("new-channel", channel.getTitle() + " was created");
+        //channelSocketHandler.broadcast("new-channel",channel);
         return getAllChannels();
     }
 
@@ -43,8 +47,9 @@ public class ChannelController {
     }
 
     @DeleteMapping("channel/{channelId}")
-    public ResponseEntity<List<Channel>> deleteChannel(@PathVariable long channelid) {
-        channelService.delete(channelid);
+    public ResponseEntity<List<Channel>> deleteChannel(@PathVariable long channelId) {
+        channelService.delete(channelId);
+        chatSocketHandler.broadcast("deleted-channel-id","Channel with ID" +channelId + " was deleted");
         return getAllChannels();
     }
 
